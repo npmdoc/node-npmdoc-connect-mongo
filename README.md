@@ -3,7 +3,7 @@
 
 [![NPM](https://nodei.co/npm/connect-mongo.png?downloads=true)](https://www.npmjs.com/package/connect-mongo)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-connect-mongo/build/screen-capture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-connect_mongo_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-connect-mongo/build..beta..travis-ci.org/apidoc.html)
+[![apidoc](https://npmdoc.github.io/node-npmdoc-connect-mongo/build/screen-capture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-connect-mongo_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-connect-mongo/build..beta..travis-ci.org/apidoc.html)
 
 ![package-listing](https://npmdoc.github.io/node-npmdoc-connect-mongo/build/screen-capture.npmPackageListing.svg)
 
