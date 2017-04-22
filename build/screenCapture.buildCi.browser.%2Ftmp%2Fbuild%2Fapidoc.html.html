@@ -1,4 +1,4 @@
-<div class="apidocDiv">
+<html><head></head><body><div class="apidocDiv">
 <style>
 /*csslint
 */
@@ -47,17 +47,10 @@
 }
 </style>
 <h1>api documentation for
-    <a
-
-        href="https://github.com/kcbanner/connect-mongo#readme"
-
-    >connect-mongo (v1.3.2)</a>
+    <a href="https://github.com/kcbanner/connect-mongo#readme">connect-mongo (v1.3.2)</a>
 </h1>
 <h4>MongoDB session store for Express and Connect</h4>
-<div class="apidocSectionDiv"><a
-    href="#apidoc.tableOfContents"
-    id="apidoc.tableOfContents"
-><h1>table of contents</h1></a><ol>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
 
     <li class="apidocModuleLi"><a href="#apidoc.module.connect-mongo">module connect-mongo</a><ol>
 
@@ -95,7 +88,7 @@
             options = options || {};
 
 <span class="apidocCodeCommentSpan">            /* Fallback */
-</span>            if (options.fallbackMemory &#x26;&#x26; MemoryStore) {
+</span>            if (options.fallbackMemory &amp;&amp; MemoryStore) {
                 return new MemoryStore();
             }
 
@@ -103,16 +96,16 @@
 
             /* Options */
             this.ttl = options.ttl || 1209600; // 14 days
-            this.collectionName = options.collection || &#x27;sessions&#x27;;
-            this.autoRemove = options.autoRemove || &#x27;native&#x27;;
+            this.collectionName = options.collection || 'sessions';
+            this.autoRemove = options.autoRemove || 'native';
             this.autoRemoveInterval = options.autoRemoveInterval || 10;
             this.transformFunctions = computeTransformFunctions(options, true);
 
             this.options = options;
 
-            this.changeState(&#x27;init&#x27;);
+            this.changeState('init');
 
-            const newConnectionCallback = (err, db) =&#x3e; {
+            const newConnectionCallback = (err, db) =&gt; {
                 if (err) {
                     this.connectionFailed(err);
                 } else {
@@ -128,9 +121,9 @@
                 if (options.mongooseConnection.readyState === 1) {
                     this.handleNewConnectionAsync(options.mongooseConnection.db);
                 } else {
-                    options.mongooseConnection.once(&#x27;open&#x27;, () =&#x3e; this.handleNewConnectionAsync(options.mongooseConnection.db));
+                    options.mongooseConnection.once('open', () =&gt; this.handleNewConnectionAsync(options.mongooseConnection.db));
                 }
-            } else if (options.db &#x26;&#x26; options.db.listCollections) {
+            } else if (options.db &amp;&amp; options.db.listCollections) {
                 // Re-use existing or upcoming native connection
                 if (options.db.openCalled || options.db.openCalled === undefined) { // openCalled is undefined in mongodb@2.x
                     this.handleNewConnectionAsync(options.db);
@@ -139,18 +132,18 @@
                 }
             } else if (options.dbPromise) {
                 options.dbPromise
-                    .then(db =&#x3e; this.handleNewConnectionAsync(db))
-                    .catch(err =&#x3e; this.connectionFailed(err));
+                    .then(db =&gt; this.handleNewConnectionAsync(db))
+                    .catch(err =&gt; this.connectionFailed(err));
             } else {
-                throw new Error(&#x27;Connection strategy not found&#x27;);
+                throw new Error('Connection strategy not found');
             }
 
-            this.changeState(&#x27;connecting&#x27;);
+            this.changeState('connecting');
 
         }
 
         connectionFailed(err) {
-            this.changeState(&#x27;disconnected&#x27;);
+            this.changeState('disconnected');
             throw err;
         }
 
@@ -159,16 +152,16 @@
             return this
                 .setCollection(db.collection(this.collectionName))
                 .setAutoRemoveAsync()
-                    .then(() =&#x3e; this.changeState(&#x27;connected&#x27;));
+                    .then(() =&gt; this.changeState('connected'));
         }
 
         setAutoRemoveAsync() {
             let removeQuery = { expires: { $lt: new Date() } };
             switch (this.autoRemove) {
-            case &#x27;native&#x27;:
+            case 'native':
                 return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
-            case &#x27;interval&#x27;:
-                this.timer = setInterval(() =&#x3e; this.collection.remove(removeQuery, { w: 0 }), this.autoRemoveInterval * 1000 * 60
+            case 'interval':
+                this.timer = setInterval(() =&gt; this.collection.remove(removeQuery, { w: 0 }), this.autoRemoveInterval * 1000 * 60
 );
                 this.timer.unref();
                 return Promise.resolve();
@@ -192,7 +185,7 @@
             this.collection = collection;
 
             // Promisify used collection methods
-            [&#x27;count&#x27;, &#x27;findOne&#x27;, &#x27;remove&#x27;, &#x27;drop&#x27;, &#x27;ensureIndex&#x27;].forEach(method =&#x3e; {
+            ['count', 'findOne', 'remove', 'drop', 'ensureIndex'].forEach(method =&gt; {
                 collection[method ...</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -206,3 +199,4 @@
     ]
 </div>
 </div>
+</body></html>

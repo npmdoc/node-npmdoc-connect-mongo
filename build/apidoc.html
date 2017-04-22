@@ -61,12 +61,142 @@
 
     <li class="apidocModuleLi"><a href="#apidoc.module.connect-mongo">module connect-mongo</a><ol>
 
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.connect-mongo.connect-mongo">
+            function <span class="apidocSignatureSpan"></span>connect-mongo
+            <span class="apidocSignatureSpan">(connect)</span>
+            </a>
+
+        </li>
+
     </ol></li>
 
 </ol></div>
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.connect-mongo" id="apidoc.module.connect-mongo">module connect-mongo</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.connect-mongo.connect-mongo" id="apidoc.element.connect-mongo.connect-mongo">
+        function <span class="apidocSignatureSpan"></span>connect-mongo
+        <span class="apidocSignatureSpan">(connect)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function connectMongo(connect) {
+    const Store = connect.Store || connect.session.Store;
+    const MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
+
+    class MongoStore extends Store {
+
+        constructor(options) {
+            options = options || {};
+
+<span class="apidocCodeCommentSpan">            /* Fallback */
+</span>            if (options.fallbackMemory &#x26;&#x26; MemoryStore) {
+                return new MemoryStore();
+            }
+
+            super(options);
+
+            /* Options */
+            this.ttl = options.ttl || 1209600; // 14 days
+            this.collectionName = options.collection || &#x27;sessions&#x27;;
+            this.autoRemove = options.autoRemove || &#x27;native&#x27;;
+            this.autoRemoveInterval = options.autoRemoveInterval || 10;
+            this.transformFunctions = computeTransformFunctions(options, true);
+
+            this.options = options;
+
+            this.changeState(&#x27;init&#x27;);
+
+            const newConnectionCallback = (err, db) =&#x3e; {
+                if (err) {
+                    this.connectionFailed(err);
+                } else {
+                    this.handleNewConnectionAsync(db);
+                }
+            };
+
+            if (options.url) {
+                // New native connection using url + mongoOptions
+                MongoClient.connect(options.url, options.mongoOptions || {}, newConnectionCallback);
+            } else if (options.mongooseConnection) {
+                // Re-use existing or upcoming mongoose connection
+                if (options.mongooseConnection.readyState === 1) {
+                    this.handleNewConnectionAsync(options.mongooseConnection.db);
+                } else {
+                    options.mongooseConnection.once(&#x27;open&#x27;, () =&#x3e; this.handleNewConnectionAsync(options.mongooseConnection.db));
+                }
+            } else if (options.db &#x26;&#x26; options.db.listCollections) {
+                // Re-use existing or upcoming native connection
+                if (options.db.openCalled || options.db.openCalled === undefined) { // openCalled is undefined in mongodb@2.x
+                    this.handleNewConnectionAsync(options.db);
+                } else {
+                    options.db.open(newConnectionCallback);
+                }
+            } else if (options.dbPromise) {
+                options.dbPromise
+                    .then(db =&#x3e; this.handleNewConnectionAsync(db))
+                    .catch(err =&#x3e; this.connectionFailed(err));
+            } else {
+                throw new Error(&#x27;Connection strategy not found&#x27;);
+            }
+
+            this.changeState(&#x27;connecting&#x27;);
+
+        }
+
+        connectionFailed(err) {
+            this.changeState(&#x27;disconnected&#x27;);
+            throw err;
+        }
+
+        handleNewConnectionAsync(db) {
+            this.db = db;
+            return this
+                .setCollection(db.collection(this.collectionName))
+                .setAutoRemoveAsync()
+                    .then(() =&#x3e; this.changeState(&#x27;connected&#x27;));
+        }
+
+        setAutoRemoveAsync() {
+            let removeQuery = { expires: { $lt: new Date() } };
+            switch (this.autoRemove) {
+            case &#x27;native&#x27;:
+                return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
+            case &#x27;interval&#x27;:
+                this.timer = setInterval(() =&#x3e; this.collection.remove(removeQuery, { w: 0 }), this.autoRemoveInterval * 1000 * 60
+);
+                this.timer.unref();
+                return Promise.resolve();
+            default:
+                return Promise.resolve();
+            }
+        }
+
+        changeState(newState) {
+            if (newState !== this.state) {
+                this.state = newState;
+                this.emit(newState);
+            }
+        }
+
+        setCollection(collection) {
+            if (this.timer) {
+                clearInterval(this.timer);
+            }
+            this.collectionReadyPromise = undefined;
+            this.collection = collection;
+
+            // Promisify used collection methods
+            [&#x27;count&#x27;, &#x27;findOne&#x27;, &#x27;remove&#x27;, &#x27;drop&#x27;, &#x27;ensureIndex&#x27;].forEach(method =&#x3e; {
+                collection[method ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 </div>
 
